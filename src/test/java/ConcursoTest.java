@@ -12,7 +12,12 @@ public class ConcursoTest {
         Concurso unConcurso = new Concurso("Un Concurso", LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(60));
         unConcurso.inscribir(jose);
         assertEquals(1, unConcurso.cantidadInscriptos());
-
+    }
+    @Test
+    public void verificarInscripcion() {
+        Participante jose = new Participante("234566", "Jose Perez");
+        Concurso unConcurso = new Concurso("Un Concurso", LocalDateTime.now().minusDays(2), LocalDateTime.now().plusDays(60));
+        assertFalse(unConcurso.estaInscripto(jose));
     }
 
     @Test
