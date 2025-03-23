@@ -68,15 +68,15 @@ public class Concurso {
         return unaFecha.equals(this.fechaInicioInscripcion);
     }
 
-    public boolean estaInscripto(Participante unParticipante) {
+    boolean estaInscripto(Participante unParticipante) {
         return listaInscriptos.contains(unParticipante);
     }
 
-    public int cantidadInscriptos() {
+    int cantidadInscriptos() {
         return this.listaInscriptos.size();
     }
 
-    public boolean inscribirPrimerDia(LocalDate fechaInscripcionParticipante){
+    boolean inscribirPrimerDia(LocalDate fechaInscripcionParticipante){
         return (fechaInicioInscripcion.equals(fechaInscripcionParticipante));
     }
 
