@@ -1,21 +1,20 @@
 package org.example;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Participante {
-    private LocalDateTime fechaInscripcion;
+
+    //------------------------------- ATRIBUTOS -------------------------------
     private int puntosObtenidos;
     private String DNI;
     private String nombre;
 
-    public Participante (String DNI, String nombre) {
-        this.fechaInscripcion=LocalDateTime.now();
-        this.DNI = DNI;
-        this.nombre = nombre;
-    }
+    static String ERROR_DNI_PARTICIPANTE = "El DNI del participante no es correcto";
+    static String ERROR_NOMBRE_PARTICIPANTE = "El nombre del participante no es correcto";
 
-    public static Participante at (String DNI, String nombre) {
+
+    //-------------------------------- MÉTODOS --------------------------------
+    static Participante nuevoParticipante(String DNI, String nombre) {
         assertValidarDNI(DNI);
         assertNombreEsValido(nombre);
         return new Participante(DNI, nombre);
@@ -23,25 +22,22 @@ public class Participante {
 
     private static void assertValidarDNI(String DNI) {
         if (DNI.isBlank() || DNI==null) {
-            throw new IllegalArgumentException("El DNI no es correcto");
+            throw new IllegalArgumentException(ERROR_DNI_PARTICIPANTE);
         }
     }
 
     private static void assertNombreEsValido(String nombre) {
         if (nombre.isBlank() || nombre==null) {
-            throw new IllegalArgumentException("El nombre no es correcto");
+            throw new IllegalArgumentException(ERROR_NOMBRE_PARTICIPANTE);
         }
-    }
-
-    LocalDateTime obtenerFechaInscripcion() {
-        return this.fechaInscripcion;
     }
 
     void sumarPuntos(int puntos) {
         this.puntosObtenidos += puntos;
     }
 
-    public int obtenerPuntos() {
+
+    int obtenerPuntos() {
         return this.puntosObtenidos;
     }
 
@@ -57,6 +53,9 @@ public class Participante {
         return Objects.hashCode(DNI);
     }
 
-
-
+    //----------------------------- CONSTRUCTORES -----------------------------
+    private Participante (String DNI, String nombre) {
+        this.DNI = DNI;
+        this.nombre = nombre;
+    }
 }

@@ -1,61 +1,71 @@
 package org.example;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Concurso {
+
+    //------------------------------- ATRIBUTOS -------------------------------
+    private String idConcurso;
     private ArrayList<Participante> listaInscriptos;
     private String nombre;
-    private LocalDateTime fechaInicioInscripcion;
-    private LocalDateTime fechaFinInscripcion;
+    private LocalDate fechaInicioInscripcion;
+    private LocalDate fechaFinInscripcion;
 
-    public Concurso(String nombre, LocalDateTime fechaInicioInscripcion, LocalDateTime fechaFinInscripcion) {
-        this.nombre = nombre;
-        this.fechaInicioInscripcion = fechaInicioInscripcion;
-        this.fechaFinInscripcion = fechaFinInscripcion;
-        this.listaInscriptos = new ArrayList<>();
-    }
+    static final String ERROR_FECHAS_CONCURSO = "La fecha de finalización no puede ser anterior a la fecha de inicio del concurso.";
+    static final String ERROR_NOMBRE_CONCURSO =  "El nombre proporcionado no es válido. Ingrese un nombre correcto.";
+    static final String ERROR_PARTICIPANTE_YA_INSCRIPTO = "El participante ya fue inscripto.";
+    static final String ERROR_FECHA_INSCRIPCION = "La inscripción al concurso ya cerró";
+    static final String ERROR_ID_CONCURSO = "No es correcto el ID para identificar al concurso";
 
-    public static Concurso at(String nombre, LocalDateTime fechaInicioInscripcion, LocalDateTime fechaFinInscripcion) {
-        assertNombreEsValido(nombre);
+
+    //-------------------------------- MÉTODOS --------------------------------
+
+    static Concurso nuevoConcurso(String id,String nombre, LocalDate fechaInicioInscripcion, LocalDate fechaFinInscripcion) {
+        assertStringEsValido(nombre, ERROR_NOMBRE_CONCURSO);
+        assertStringEsValido(id, ERROR_ID_CONCURSO);
         assertFechaValida(fechaInicioInscripcion, fechaFinInscripcion);
-        return new Concurso(nombre, fechaInicioInscripcion, fechaFinInscripcion);
+        return new Concurso(id, nombre, fechaInicioInscripcion, fechaFinInscripcion);
     }
 
-    private static void assertFechaValida(LocalDateTime fechaInicioInscripcion, LocalDateTime fechaFinInscripcion) {
+    private static void assertFechaValida(LocalDate fechaInicioInscripcion, LocalDate fechaFinInscripcion) {
         if (fechaInicioInscripcion.isAfter(fechaFinInscripcion) || fechaFinInscripcion.isBefore(fechaInicioInscripcion)) {
-            throw new IllegalArgumentException("Las fechas del concurso no son correctas");
+            throw new IllegalArgumentException(ERROR_FECHAS_CONCURSO);
         }
     }
 
-
-    private static void assertNombreEsValido(String nombre) {
-        if (nombre.isBlank() || nombre==null) {
-            throw new IllegalArgumentException("El nombre no es correcto");
+    private static void assertStringEsValido(String datoDelConcurso, String unMensajeException ) {
+        if (datoDelConcurso.isBlank() || datoDelConcurso==null) {
+            throw new IllegalArgumentException(unMensajeException);
         }
     }
 
-    public void inscribir(Participante unParticipante) {
-        if (estaInscripto(unParticipante) || !esValidaInscripcion(unParticipante.obtenerFechaInscripcion())) {
-            throw new RuntimeException("No se puede inscribir al participante");
-        }
+    void inscribirAConFecha(Participante unParticipante, LocalDate fechaInscripcionParticipante) {
+        validarInscripcion (fechaInscripcionParticipante, unParticipante);
         this.listaInscriptos.add(unParticipante);
-        if (inscripcionPrimerDia(unParticipante)) {
-           unParticipante.sumarPuntos(10);
-       }
-
+        if (inscribirPrimerDia(fechaInscripcionParticipante)) {
+            unParticipante.sumarPuntos(10);
+        }
     }
-    private boolean esValidaInscripcion(LocalDateTime unaFecha) {
+
+    private void validarInscripcion(LocalDate fechaInscripcionParticipante, Participante unParticipante) {
+        if (!esValidaInscripcion(fechaInscripcionParticipante)) {
+            throw new RuntimeException(ERROR_FECHA_INSCRIPCION);
+        }
+        if (estaInscripto(unParticipante)) {
+            throw new RuntimeException(ERROR_PARTICIPANTE_YA_INSCRIPTO);
+        }
+    }
+
+    private boolean esValidaInscripcion(LocalDate unaFecha) {
         return (entreInicioFin(unaFecha) || esIgual(unaFecha));
     }
 
-    private boolean entreInicioFin(LocalDateTime unaFecha) {
+    private boolean entreInicioFin(LocalDate unaFecha) {
         return unaFecha.isAfter(fechaInicioInscripcion) && unaFecha.isBefore(fechaFinInscripcion);
     }
 
-    private boolean esIgual(LocalDateTime unaFecha) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return unaFecha.format(formatter).equals(this.fechaInicioInscripcion.format(formatter));
+    private boolean esIgual(LocalDate unaFecha) {
+        return unaFecha.equals(this.fechaInicioInscripcion);
     }
 
     public boolean estaInscripto(Participante unParticipante) {
@@ -66,11 +76,19 @@ public class Concurso {
         return this.listaInscriptos.size();
     }
 
-    public boolean inscripcionPrimerDia(Participante unParticipante){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return (fechaInicioInscripcion.format(formatter).equals(unParticipante.obtenerFechaInscripcion().format(formatter)));
+    public boolean inscribirPrimerDia(LocalDate fechaInscripcionParticipante){
+        return (fechaInicioInscripcion.equals(fechaInscripcionParticipante));
     }
 
+    //----------------------------- CONSTRUCTORES -----------------------------
+
+    private Concurso(String idConcurso, String nombre, LocalDate fechaInicioInscripcion, LocalDate fechaFinInscripcion) {
+        this.idConcurso= idConcurso;
+        this.nombre = nombre;
+        this.fechaInicioInscripcion = fechaInicioInscripcion;
+        this.fechaFinInscripcion = fechaFinInscripcion;
+        this.listaInscriptos = new ArrayList<>();
+    }
 
    }
 
